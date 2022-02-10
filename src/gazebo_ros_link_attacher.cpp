@@ -46,7 +46,8 @@ namespace gazebo
   }
 
   bool GazeboRosLinkAttacher::attach(std::string model1, std::string link1,
-                                     std::string model2, std::string link2)
+                                     std::string model2, std::string link2,
+                                     const gazebo_ros_link_attacher::JointInfo& joint_info)
   {
 
     // look for any previous instance of the joint first.
@@ -114,7 +115,7 @@ namespace gazebo
     ROS_DEBUG_STREAM("Links are: "  << l1->GetName() << " and " << l2->GetName());
 
     ROS_DEBUG_STREAM("Creating revolute joint on model: '" << model1 << "'");
-    j.joint = this->physics->CreateJoint("revolute", m1);
+    j.joint = this->physics->CreateJoint(joint_info.type, m1);
     this->joints.push_back(j);
 
     ROS_DEBUG_STREAM("Attach");
@@ -137,10 +138,13 @@ namespace gazebo
      /tmp/buildd/gazebo2-2.2.3/gazebo/physics/ode/ODELink.cc(183): Inertial pointer is NULL
      */
 
+    ignition::math::Vector3d rotation_axis(0, 0, 0);
+    rotation_axis[joint_info.axis] = 1;
+    j.joint->SetAxis(0.0, rotation_axis);
     ROS_DEBUG_STREAM("SetHightstop");
-    j.joint->SetUpperLimit(0, 0);
+    j.joint->SetUpperLimit(0, joint_info.upper_limit);
     ROS_DEBUG_STREAM("SetLowStop");
-    j.joint->SetLowerLimit(0, 0);
+    j.joint->SetLowerLimit(0, joint_info.lower_limit);
     ROS_DEBUG_STREAM("Init");
     j.joint->Init();
     ROS_INFO_STREAM("Attach finished.");
@@ -184,8 +188,15 @@ namespace gazebo
     ROS_INFO_STREAM("Received request to attach model: '" << req.model_name_1
                     << "' using link: '" << req.link_name_1 << "' with model: '"
                     << req.model_name_2 << "' using link: '" <<  req.link_name_2 << "'");
+
+    gazebo_ros_link_attacher::JointInfo joint_info;
+    joint_info.type = req.joint_info.empty() ? "revolute" : req.joint_info[0].type;
+    joint_info.axis = req.joint_info.empty() ? 0 : req.joint_info[0].axis;
+    joint_info.lower_limit = req.joint_info.empty() ? 0 : req.joint_info[0].lower_limit;
+    joint_info.upper_limit = req.joint_info.empty() ? 0 : req.joint_info[0].upper_limit;
     if (! this->attach(req.model_name_1, req.link_name_1,
-                       req.model_name_2, req.link_name_2)){
+                       req.model_name_2, req.link_name_2,
+                       joint_info)){
       ROS_ERROR_STREAM("Could not make the attach.");
       res.ok = false;
     }

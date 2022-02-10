@@ -29,6 +29,11 @@ find_package(catkin REQUIRED COMPONENTS
 # Depend on system install of Gazebo
 find_package(gazebo REQUIRED)
 
+add_message_files(
+  FILES
+  JointInfo.msg
+)
+
 add_service_files(
   FILES
   Attach.srv

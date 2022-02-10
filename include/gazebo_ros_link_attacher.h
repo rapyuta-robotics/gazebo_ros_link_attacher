@@ -22,6 +22,7 @@
 #include "gazebo_ros_link_attacher/Attach.h"
 #include "gazebo_ros_link_attacher/AttachRequest.h"
 #include "gazebo_ros_link_attacher/AttachResponse.h"
+#include "gazebo_ros_link_attacher/JointInfo.h"
 
 namespace gazebo
 {
@@ -40,7 +41,8 @@ namespace gazebo
 
         /// \brief Attach with a revolute joint
         bool attach(std::string model1, std::string link1,
-                    std::string model2, std::string link2);
+                    std::string model2, std::string link2,
+                    const gazebo_ros_link_attacher::JointInfo& joint_info);
 
         /// \brief Detach
         bool detach(std::string model1, std::string link1,
