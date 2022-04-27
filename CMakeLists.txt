@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(catkin REQUIRED COMPONENTS 
   roscpp 
   gazebo_ros
+  geometry_msgs
   std_msgs
   message_generation
 )
@@ -30,6 +31,7 @@ add_service_files(
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
 )
 
 ###################################

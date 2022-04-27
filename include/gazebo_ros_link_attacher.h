@@ -42,7 +42,9 @@ namespace gazebo
         /// \brief Attach with a revolute joint
         bool attach(std::string model1, std::string link1,
                     std::string model2, std::string link2,
-                    const gazebo_ros_link_attacher::JointInfo& joint_info);
+                    const gazebo_ros_link_attacher::JointInfo& joint_info,
+                    bool teleport_child_to_parent,
+                    const ignition::math::Vector3d& offset);
 
         /// \brief Detach
         bool detach(std::string model1, std::string link1,
