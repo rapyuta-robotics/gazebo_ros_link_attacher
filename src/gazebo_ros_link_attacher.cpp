@@ -119,8 +119,7 @@ namespace gazebo
 
     if (teleport_child_to_parent) {
       auto pose = j.m1->WorldPose();
-      pose.Pos() =
-      j.m1->WorldPose().Pos() + offset;
+      pose.Pos() += offset;
       j.m2->SetWorldPose(pose);
     }
 
