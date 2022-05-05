@@ -47,8 +47,11 @@ namespace gazebo
 
   bool GazeboRosLinkAttacher::attach(std::string model1, std::string link1,
                                      std::string model2, std::string link2,
-                                     const gazebo_ros_link_attacher::JointInfo& joint_info)
+                                     const gazebo_ros_link_attacher::JointInfo& joint_info,
+                                     bool teleport_child_to_parent,
+                                     const ignition::math::Vector3d& offset)
   {
+    gazebo_ros_link_attacher::Attach::Request req;
 
     // look for any previous instance of the joint first.
     // if we try to create a joint in between two links
@@ -113,6 +116,12 @@ namespace gazebo
     j.l2 = l2;
 
     ROS_DEBUG_STREAM("Links are: "  << l1->GetName() << " and " << l2->GetName());
+
+    if (teleport_child_to_parent) {
+      auto pose = j.m1->WorldPose();
+      pose.Pos() += offset;
+      j.m2->SetWorldPose(pose);
+    }
 
     ROS_DEBUG_STREAM("Creating revolute joint on model: '" << model1 << "'");
     j.joint = this->physics->CreateJoint(joint_info.type, m1);
@@ -194,13 +203,14 @@ namespace gazebo
     joint_info.axis = req.joint_info.empty() ? 0 : req.joint_info[0].axis;
     joint_info.lower_limit = req.joint_info.empty() ? 0 : req.joint_info[0].lower_limit;
     joint_info.upper_limit = req.joint_info.empty() ? 0 : req.joint_info[0].upper_limit;
-    if (! this->attach(req.model_name_1, req.link_name_1,
-                       req.model_name_2, req.link_name_2,
-                       joint_info)){
+
+    ignition::math::Vector3d offset(req.offset.x, req.offset.y, req.offset.z);
+    if (!this->attach(req.model_name_1, req.link_name_1, req.model_name_2,
+                      req.link_name_2, joint_info, req.teleport_child_to_parent,
+                      offset)) {
       ROS_ERROR_STREAM("Could not make the attach.");
       res.ok = false;
-    }
-    else{
+    } else {
       ROS_INFO_STREAM("Attach was succesful");
       res.ok = true;
     }
