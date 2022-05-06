@@ -70,7 +70,6 @@ namespace gazebo
         ros::NodeHandle nh_;
         ros::ServiceServer attach_service_;
         ros::ServiceServer detach_service_;
-        sensor_msgs::JointState joint_state_;
         ros::Publisher joint_state_pub_;
 
         bool attach_callback(gazebo_ros_link_attacher::Attach::Request &req,

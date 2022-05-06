@@ -258,14 +258,14 @@ namespace gazebo
       detach_vector.clear();
     }
 
-    joint_state_ = sensor_msgs::JointState();
-    for (const auto& joint : joints) {
-      joint_state_.name.push_back(joint.joint->GetName());
-      joint_state_.position.push_back(joint.joint->Position());
-      joint_state_.velocity.push_back(joint.joint->GetVelocity(0));
-    }
-    if (!joint_state_.name.empty() && joint_state_pub_.getNumSubscribers() > 0) {
-      joint_state_pub_.publish(joint_state_);
+    if (joint_state_pub_.getNumSubscribers() > 0) {
+      sensor_msgs::JointState joint_state;
+      for (const auto& joint : joints) {
+        joint_state.name.push_back(joint.joint->GetName());
+        joint_state.position.push_back(joint.joint->Position());
+        joint_state.velocity.push_back(joint.joint->GetVelocity(0));
+      }
+      joint_state_pub_.publish(joint_state);
     }
   }
 
