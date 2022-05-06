@@ -18,6 +18,7 @@ namespace gazebo
     std::vector<fixedJoint> vect;
     this->detach_vector = vect;
     this->beforePhysicsUpdateConnection = event::Events::ConnectBeforePhysicsUpdate(std::bind(&GazeboRosLinkAttacher::OnUpdate, this));
+    joint_state_pub_ = nh_.advertise<sensor_msgs::JointState>("joint_states", 1);
   }
 
 
@@ -125,6 +126,7 @@ namespace gazebo
 
     ROS_DEBUG_STREAM("Creating revolute joint on model: '" << model1 << "'");
     j.joint = this->physics->CreateJoint(joint_info.type, m1);
+    j.joint->SetName(model1 + "_" + link1 + "_" + model2 + "_" + link2 + "_joint");
     this->joints.push_back(j);
 
     ROS_DEBUG_STREAM("Attach");
@@ -157,6 +159,8 @@ namespace gazebo
     ROS_DEBUG_STREAM("Init");
     j.joint->Init();
     ROS_INFO_STREAM("Attach finished.");
+
+    ROS_INFO_STREAM_NAMED("gazebo_ros_link_attacher", "Joint " << j.joint->GetName() << " created.");
 
     return true;
   }
@@ -252,6 +256,16 @@ namespace gazebo
         ++it;
       }
       detach_vector.clear();
+    }
+
+    joint_state_ = sensor_msgs::JointState();
+    for (const auto& joint : joints) {
+      joint_state_.name.push_back(joint.joint->GetName());
+      joint_state_.position.push_back(joint.joint->Position());
+      joint_state_.velocity.push_back(joint.joint->GetVelocity(0));
+    }
+    if (!joint_state_.name.empty() && joint_state_pub_.getNumSubscribers() > 0) {
+      joint_state_pub_.publish(joint_state_);
     }
   }
 
