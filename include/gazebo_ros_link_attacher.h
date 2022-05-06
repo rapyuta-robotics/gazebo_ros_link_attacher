@@ -8,6 +8,7 @@
 #define GAZEBO_ROS_LINK_ATTACHER_HH
 
 #include <ros/ros.h>
+#include <sensor_msgs/JointState.h>
 
 #include <sdf/sdf.hh>
 #include "gazebo/gazebo.hh"
@@ -69,6 +70,7 @@ namespace gazebo
         ros::NodeHandle nh_;
         ros::ServiceServer attach_service_;
         ros::ServiceServer detach_service_;
+        ros::Publisher joint_state_pub_;
 
         bool attach_callback(gazebo_ros_link_attacher::Attach::Request &req,
                               gazebo_ros_link_attacher::Attach::Response &res);
