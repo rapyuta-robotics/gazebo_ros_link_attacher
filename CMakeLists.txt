@@ -46,7 +46,7 @@ catkin_package(CATKIN_DEPENDS message_runtime)
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(include)
-include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS} ${GAZEBO_INCLUDE_DIRS})
 
 ## Declare a cpp library
 add_library(${PROJECT_NAME} src/gazebo_ros_link_attacher.cpp)
